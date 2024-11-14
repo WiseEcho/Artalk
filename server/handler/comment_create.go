@@ -4,6 +4,7 @@ import (
 	"cmp"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/artalkjs/artalk/v2/internal/core"
 	"github.com/artalkjs/artalk/v2/internal/entity"
@@ -15,8 +16,8 @@ import (
 )
 
 type ParamsCommentCreate struct {
-	Name    string `json:"name" validate:"required"`    // The comment name
-	Email   string `json:"email" validate:"required"`   // The comment email
+	Name    string `json:"name" validate:"optional"`    // The comment name
+	Email   string `json:"email" validate:"optional"`   // The comment email
 	Link    string `json:"link" validate:"optional"`    // The comment link
 	Content string `json:"content" validate:"required"` // The comment content
 	Rid     uint   `json:"rid" validate:"optional"`     // The comment rid
@@ -51,11 +52,18 @@ func CommentCreate(app *core.App, router fiber.Router) {
 			return resp
 		}
 
+		uc, err := common.DecryptAuth(app.Conf().TokenSecret, c.Get("authorization"))
+		if err != nil {
+			return err
+		}
+
 		if !utils.ValidateEmail(p.Email) {
 			return common.RespError(c, 400, i18n.T("Invalid {{name}}", Map{"name": i18n.T("Email")}))
 		}
-		if p.Link != "" && !utils.ValidateURL(p.Link) {
-			return common.RespError(c, 400, i18n.T("Invalid {{name}}", Map{"name": i18n.T("Link")}))
+
+		emails := strings.Split(p.Email, "@")
+		if !(len(emails) == 2 && emails[0] == uc.UserID) {
+			return errors.New("email invalid")
 		}
 
 		if _, ok, resp := common.CheckSiteExist(app, c, p.SiteName); !ok {

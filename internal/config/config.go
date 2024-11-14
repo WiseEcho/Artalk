@@ -23,6 +23,7 @@ type Config struct {
 	SiteURL        string                 `koanf:"site_url" json:"site_url"`               // 默认站点 URL
 	AdminUsers     []AdminUserConf        `koanf:"admin_users" json:"admin_users"`         // 管理员账户
 	LoginTimeout   int                    `koanf:"login_timeout" json:"login_timeout"`     // 登录超时
+	TokenSecret    string                 `koanf:"token_secret" json:"token_secret"`       // token secret
 	Moderator      ModeratorConf          `koanf:"moderator" json:"moderator"`             // 评论审查
 	Captcha        CaptchaConf            `koanf:"captcha" json:"captcha"`                 // 验证码
 	Email          EmailConf              `koanf:"email" json:"email"`                     // 邮箱提醒

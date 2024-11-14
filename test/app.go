@@ -5,17 +5,19 @@ import (
 	"path"
 	"path/filepath"
 	"runtime"
+	"time"
 
 	"github.com/artalkjs/artalk/v2/internal/config"
 	"github.com/artalkjs/artalk/v2/internal/core"
 	"github.com/artalkjs/artalk/v2/internal/dao"
-	db_logger "github.com/artalkjs/artalk/v2/internal/db/logger"
+	"github.com/artalkjs/artalk/v2/internal/log"
+	"github.com/artalkjs/artalk/v2/internal/log/zapgorm2"
 	"github.com/artalkjs/artalk/v2/internal/pkged"
 	"github.com/artalkjs/artalk/v2/internal/utils"
 	"github.com/go-testfixtures/testfixtures/v3"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"gorm.io/gorm/schema"
+	gormlogger "gorm.io/gorm/logger"
 )
 
 var dbFile *os.File
@@ -59,13 +61,15 @@ func NewTestApp() (*TestApp, error) {
 	// prepare db folder
 	utils.EnsureDir(filepath.Dir(dbFile.Name()))
 
+	logLevel := gormlogger.Info
 	// open a sqlite db
 	dbInstance, err := gorm.Open(sqlite.Open(dbFile.Name()), &gorm.Config{
-		Logger: db_logger.New(),
-		NamingStrategy: schema.NamingStrategy{
-			TablePrefix: "atk_", // Test table prefix, fixture filenames should match this
-		},
-		DisableForeignKeyConstraintWhenMigrating: true,
+		Logger: zapgorm2.New(log.GetLogger(), gormlogger.Config{
+			Colorful:                  true,
+			IgnoreRecordNotFoundError: false,
+			SlowThreshold:             200 * time.Millisecond,
+			LogLevel:                  logLevel,
+		}),
 	})
 	if err != nil {
 		return nil, err

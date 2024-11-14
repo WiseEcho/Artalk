@@ -62,7 +62,7 @@ func LogWithHttpInfo(c *fiber.Ctx, logFn func(l *zap.SugaredLogger)) {
 		id = c.GetRespHeader(fiber.HeaderXRequestID)
 	}
 
-	logger := log.StandardLogger().Sugar().With(
+	logger := log.GetLogger().With(
 		"id", id,
 		"path", path,
 		"method", c.Method(),

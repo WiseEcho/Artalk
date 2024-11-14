@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 
-	"github.com/artalkjs/artalk/v2/internal/log"
 	"github.com/artalkjs/artalk/v2/server"
 
 	"github.com/spf13/cobra"

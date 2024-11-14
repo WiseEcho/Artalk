@@ -1,6 +1,8 @@
 package dao
 
 import (
+	"errors"
+
 	"github.com/artalkjs/artalk/v2/internal/entity"
 	"github.com/artalkjs/artalk/v2/internal/log"
 )
@@ -50,8 +52,12 @@ func (dao *Dao) NewUser(name string, email string, link string) (entity.User, er
 }
 
 func (dao *Dao) CreateUser(user *entity.User) error {
-	err := dao.DB().Create(&user).Error
-	if err != nil {
+	users := dao.FindUsersByEmail(user.Email)
+	if len(users) > 0 {
+		return errors.New("user exists already")
+	}
+
+	if err := dao.DB().Create(&user).Error; err != nil {
 		return err
 	}
 

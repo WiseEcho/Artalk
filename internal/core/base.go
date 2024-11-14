@@ -79,12 +79,13 @@ func (app *App) Bootstrap() error {
 
 	// i18n
 	app.initI18n()
-
-	// log
-	log.Init(log.Options{
-		IsDiscard: !app.Conf().Log.Enabled,
-		IsDebug:   app.Conf().Debug,
-		LogFile:   app.Conf().Log.Filename,
+	log.InitLogger(&log.LumberjackWrapperConfig{
+		Path:       "/tmp",
+		MaxSize:    50,
+		MaxBackups: 10,
+		MaxAge:     120,
+		BufferSize: 0,
+		IsCompress: false,
 	})
 
 	// DAO
@@ -148,9 +149,6 @@ func (app *App) ResetBootstrapState() error {
 			}
 		}
 	}
-
-	// sync log
-	_ = log.Sync() // ignore error @see https://github.com/uber-go/zap/issues/991
 
 	return nil
 }

@@ -68,7 +68,7 @@ func UserCreate(app *core.App, router fiber.Router) {
 		if p.Password != "" {
 			err := user.SetPasswordEncrypt(p.Password)
 			if err != nil {
-				log.Errorln(err)
+				log.Error(err)
 				return common.RespError(c, 500, i18n.T("Password update failed"))
 			}
 		}

@@ -49,7 +49,7 @@ func (dao *Dao) CookComment(c *entity.Comment) entity.CookedComment {
 		ContentMarked:  markedContent,
 		UserID:         c.UserID,
 		Nick:           user.Name,
-		EmailEncrypted: getCommentEmailHash(user.Email),
+		EmailEncrypted: getCommentEmailHash(user.Link),
 		Link:           user.Link,
 		UA:             c.UA,
 		Date:           c.CreatedAt.Local().Format(CommonDateTimeFormat),

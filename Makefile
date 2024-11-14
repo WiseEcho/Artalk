@@ -1,9 +1,16 @@
 PKG_NAME    := github.com/artalkjs/artalk/v2
 BIN_NAME	:= ./bin/artalk
 
+
 HAS_RICHGO  := $(shell which richgo)
 GOTEST      ?= $(if $(HAS_RICHGO), richgo test, go test)
 ARGS        ?= server
+
+BRANCH=$(shell git rev-parse --abbrev-ref HEAD)
+VERSION=git-$(subst /,-,$(BRANCH))-$(shell date +%Y%m%d%H)-$(shell git describe --always --dirty)
+IMAGE_TAG=$(VERSION)
+IAMGE_REPO=d-x.cmstop.net
+PROJECT_NAME=artalk
 
 export CGO_ENABLED := 1
 
@@ -20,6 +27,17 @@ build:
     	-ldflags "-s -w" \
         -o $(BIN_NAME) \
     	$(PKG_NAME)
+
+linux:
+	env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 CC="x86_64-linux-musl-gcc" CXX="x86_64-linux-musl-g++" go build -tags=jsoniter -v -o ./artalk
+
+ship: linux
+	docker build --platform=linux/amd64 -f Dockerfile.server -t ${IAMGE_REPO}/${PROJECT_NAME}:${IMAGE_TAG} .
+	docker push ${IAMGE_REPO}/${PROJECT_NAME}:${IMAGE_TAG}
+	docker rmi ${IAMGE_REPO}/${PROJECT_NAME}:${IMAGE_TAG}
+	docker image prune -f
+
+push: ship
 
 build-frontend:
 	./scripts/build-frontend.sh

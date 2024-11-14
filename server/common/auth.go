@@ -1,13 +1,12 @@
 package common
 
 import (
-	"encoding/json"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/artalkjs/artalk/v2/internal/core"
 	"github.com/artalkjs/artalk/v2/internal/entity"
+	"github.com/artalkjs/artalk/v2/internal/log"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt"
 )
@@ -45,57 +44,18 @@ var ErrTokenNotProvided = fmt.Errorf("token not provided")
 var ErrTokenUserNotFound = fmt.Errorf("user not found")
 var ErrTokenInvalidFromDate = fmt.Errorf("token is invalid starting from a certain date")
 
-func GetTokenByReq(c *fiber.Ctx) string {
-	token := c.Query("token")
-	if token == "" {
-		token = c.FormValue("token")
-	}
-	if token == "" {
-		token = c.Get(fiber.HeaderAuthorization)
-		token = strings.TrimPrefix(token, "Bearer ")
-	}
-	return token
-}
-
-func GetJwtDataByReq(app *core.App, c *fiber.Ctx) (jwtCustomClaims, error) {
-	token := GetTokenByReq(c)
-	if token == "" {
-		return jwtCustomClaims{}, ErrTokenNotProvided
-	}
-
-	jwt, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
-		if t.Method.Alg() != "HS256" {
-			return nil, fmt.Errorf("unexpected jwt signing method=%v", t.Header["alg"])
-		}
-
-		return []byte(app.Conf().AppKey), nil // 密钥
-	})
-	if err != nil {
-		return jwtCustomClaims{}, err
-	}
-
-	claims := jwtCustomClaims{}
-	tmp, _ := json.Marshal(jwt.Claims)
-	_ = json.Unmarshal(tmp, &claims)
-
-	return claims, nil
-}
-
 func GetUserByReq(app *core.App, c *fiber.Ctx) (entity.User, error) {
-	claims, err := GetJwtDataByReq(app, c)
+	uc, err := DecryptAuth(app.Conf().TokenSecret, c.Get(fiber.HeaderAuthorization))
 	if err != nil {
+		log.Errorf("GetUserByReq|DecryptAuth token:%s err:%v", c.Get(fiber.HeaderAuthorization), err)
 		return entity.User{}, err
 	}
 
-	user := app.Dao().FindUserByID(claims.UserID)
-	if user.IsEmpty() {
-		return entity.User{}, ErrTokenUserNotFound
+	email := fmt.Sprintf("%s@9466.com", uc.UserID)
+	users := app.Dao().FindUsersByEmail(email)
+	if len(users) == 0 {
+		return entity.User{}, ErrTokenNotProvided
 	}
 
-	// check tokenValidFrom
-	if user.TokenValidFrom.Valid && claims.IssuedAt < user.TokenValidFrom.Time.Unix() {
-		return entity.User{}, ErrTokenInvalidFromDate
-	}
-
-	return user, nil
+	return users[0], nil
 }

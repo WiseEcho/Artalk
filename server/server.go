@@ -56,7 +56,7 @@ func Serve(app *core.App) (*fiber.App, error) {
 	})
 
 	reqID(fb)
-	logger(fb, app.Conf().Debug)
+	logger(fb)
 	swaggerDocs(fb)
 	cors(app, fb)
 	actionLimit(app, fb)
@@ -156,21 +156,19 @@ func reqID(fb *fiber.App) {
 	fb.Use(requestid.New())
 }
 
-func logger(fb *fiber.App, debugMode bool) {
+func logger(fb *fiber.App) {
 	fb.Use(fiber_logger.New(fiber_logger.Config{
 		Format:        "[HTTP] ${time} | ${status} | ${latency} | ${ip} | ${method} | ${path} | ${error} | ${respHeader:X-Request-ID}",
 		Output:        io.Discard,
 		DisableColors: true,
 		Done: func(c *fiber.Ctx, msg []byte) {
-			l := log.StandardLogger().WithOptions(
+			l := log.GetLogger().WithOptions(
 				zap.AddStacktrace(zapcore.DPanicLevel),
 				zap.WithCaller(false),
 			)
 			code := c.Response().StatusCode()
 			if (code >= 200 && code <= 299) || (code >= 300 && code <= 308) {
-				if debugMode {
-					l.Info(string(msg))
-				}
+				l.Info(string(msg))
 			} else {
 				l.Error(string(msg))
 			}

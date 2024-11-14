@@ -2,20 +2,24 @@ package db
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/artalkjs/artalk/v2/internal/config"
-	"github.com/artalkjs/artalk/v2/internal/db/logger"
+	"github.com/artalkjs/artalk/v2/internal/log"
+	"github.com/artalkjs/artalk/v2/internal/log/zapgorm2"
 	"gorm.io/gorm"
+	gormlogger "gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 )
 
 func NewDB(conf config.DBConf) (*gorm.DB, error) {
 	gormConfig := &gorm.Config{
-		Logger: logger.New(),
-		NamingStrategy: schema.NamingStrategy{
-			TablePrefix: conf.TablePrefix,
-		},
-		DisableForeignKeyConstraintWhenMigrating: true,
+		Logger: zapgorm2.New(log.GetLogger(), gormlogger.Config{
+			Colorful:                  true,
+			IgnoreRecordNotFoundError: false,
+			SlowThreshold:             200 * time.Millisecond,
+			LogLevel:                  gormlogger.Info,
+		}),
 	}
 
 	// Enable Prepared Statement by default
