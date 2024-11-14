@@ -55,6 +55,7 @@ export function handleConfFormServer(conf: ConfigPartial): ConfigPartial {
     'countEl',
     'statPageKeyAttr',
     'pageVote',
+    'user'
   ]
   Object.keys(conf).forEach((k) => {
     if (ExcludedKeys.includes(k as any)) delete conf[k]

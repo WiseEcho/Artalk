@@ -14,6 +14,7 @@ import type {
   Context as IContext,
   EventHandler,
 } from '@/types'
+const LOCAL_USER_KEY = 'ArtalkUser'
 
 /**
  * Artalk
@@ -30,6 +31,7 @@ export default class Artalk {
     $root.innerHTML = ''
     conf.darkMode == true && $root.classList.add('atk-dark-mode')
 
+    window.localStorage.setItem(LOCAL_USER_KEY, JSON.stringify(conf.user))
     // Init Context
     const ctx = (this.ctx = new Context($root))
 

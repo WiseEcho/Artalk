@@ -17,6 +17,7 @@ export class UserManager implements IUserManager {
     this.data = {
       name: localUser.name || localUser.nick || '', // nick is deprecated (for historical compatibility)
       email: localUser.email || '',
+      avatar: localUser.avatar || '',
       link: localUser.link || '',
       token: localUser.token || '',
       is_admin: localUser.is_admin || localUser.isAdmin || false,

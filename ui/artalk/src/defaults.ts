@@ -6,7 +6,12 @@ export const Defaults: Readonly<RequiredExcept<Config, ExcludedKeys>> = {
   pageTitle: '',
   server: '',
   site: '',
-
+  user: {
+    name: '',
+    email: '',
+    avatar: '',
+    token: '',
+  },
   placeholder: '',
   noComment: '',
   sendBtn: '',

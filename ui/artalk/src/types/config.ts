@@ -20,6 +20,21 @@ export interface Config {
   /** Site name */
   site: string
 
+  user: {
+    /** Username (aka. Nickname) */
+    name: string
+
+    /** Email */
+    email: string
+
+    /** Avatar URL */
+    avatar: string
+
+    /** 9466 Token */
+    token: string
+
+  }
+
   /** Placeholder text for the comment input box */
   placeholder: string
 

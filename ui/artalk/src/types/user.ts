@@ -10,6 +10,10 @@ export interface LocalUser {
   /** Email */
   email: string
 
+  /** Avatar URL */
+  avatar: string
+
+
   /** Link (aka. Website) */
   link: string
 

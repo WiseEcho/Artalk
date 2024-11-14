@@ -15,7 +15,7 @@ export default class SubmitAddPreset {
   }
 
   async getSubmitAddParams() {
-    const { name, email, link } = this.kit.useUser().getData()
+    const { name, email, link, avatar } = this.kit.useUser().getData()
     const conf = this.kit.useConf()
 
     return {
@@ -23,6 +23,7 @@ export default class SubmitAddPreset {
       name,
       email,
       link,
+      avatar,
       rid: 0,
       page_key: conf.pageKey,
       page_title: conf.pageTitle,
