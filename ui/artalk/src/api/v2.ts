@@ -134,6 +134,8 @@ export interface HandlerParamsCommentCreate {
   /** The comment link */
   link?: string
   /** The comment name */
+  avatar: string
+  /** The avatar url */
   name: string
   /** The comment page_key */
   page_key: string
