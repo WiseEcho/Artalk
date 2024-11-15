@@ -33,7 +33,7 @@ type ConfData struct {
 }
 
 func GetApiPublicConfDataMap(app *core.App, c *fiber.Ctx) ConfData {
-	isAdmin := CheckIsAdminReq(app, c)
+	_, isAdmin := CheckIsAdminReq(app, c)
 	imgUpload := app.Conf().ImgUpload.Enabled
 	if isAdmin {
 		imgUpload = true // 管理员始终允许上传图片

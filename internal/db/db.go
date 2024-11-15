@@ -16,7 +16,7 @@ func NewDB(conf config.DBConf) (*gorm.DB, error) {
 	gormConfig := &gorm.Config{
 		Logger: zapgorm2.New(log.GetLogger(), gormlogger.Config{
 			Colorful:                  true,
-			IgnoreRecordNotFoundError: false,
+			IgnoreRecordNotFoundError: true,
 			SlowThreshold:             200 * time.Millisecond,
 			LogLevel:                  gormlogger.Info,
 		}),

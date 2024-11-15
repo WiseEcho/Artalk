@@ -11,7 +11,8 @@ import (
 
 func AdminGuard(app *core.App, handler fiber.Handler) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		if !CheckIsAdminReq(app, c) {
+		_, isAdmin := CheckIsAdminReq(app, c)
+		if !isAdmin {
 			return RespError(c, 403, i18n.T("Admin access required"), Map{"need_login": true})
 		}
 
@@ -33,10 +34,11 @@ func LoginGuard(app *core.App, handler func(*fiber.Ctx, entity.User) error) fibe
 	}
 }
 
-func CheckIsAdminReq(app *core.App, c *fiber.Ctx) bool {
+func CheckIsAdminReq(app *core.App, c *fiber.Ctx) (uint, bool) {
 	user, err := GetUserByReq(app, c)
 	if err != nil {
-		return false
+		return 0, false
 	}
-	return !user.IsEmpty() && user.IsAdmin
+
+	return user.ID, !user.IsEmpty() && user.IsAdmin
 }

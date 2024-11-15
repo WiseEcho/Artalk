@@ -37,9 +37,10 @@ func UserStatus(app *core.App, router fiber.Router) {
 			isAdmin = app.Dao().IsAdminUserByNameEmail(p.Name, p.Email)
 		}
 
+		_, isLogin := common.CheckIsAdminReq(app, c)
 		return common.RespData(c, ResponseUserStatus{
 			IsAdmin: isAdmin,
-			IsLogin: common.CheckIsAdminReq(app, c),
+			IsLogin: isLogin,
 		})
 	})
 }

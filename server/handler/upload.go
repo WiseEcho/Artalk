@@ -45,7 +45,8 @@ type ResponseUpload struct {
 func Upload(app *core.App, router fiber.Router) {
 	router.Post("/upload", common.LimiterGuard(app, func(c *fiber.Ctx) error {
 		// 功能开关 (管理员始终开启)
-		if !app.Conf().ImgUpload.Enabled && !common.CheckIsAdminReq(app, c) {
+		_, isAdmin := common.CheckIsAdminReq(app, c)
+		if !app.Conf().ImgUpload.Enabled && !isAdmin {
 			return common.RespError(c, 403, i18n.T("Image upload forbidden"), common.Map{
 				"img_upload_enabled": false,
 			})

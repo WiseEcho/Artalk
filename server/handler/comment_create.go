@@ -19,6 +19,7 @@ type ParamsCommentCreate struct {
 	Name    string `json:"name" validate:"optional"`    // The comment name
 	Email   string `json:"email" validate:"optional"`   // The comment email
 	Link    string `json:"link" validate:"optional"`    // The comment link
+	Avatar  string `json:"avatar" validate:"optional"`  // The comment avatar
 	Content string `json:"content" validate:"required"` // The comment content
 	Rid     uint   `json:"rid" validate:"optional"`     // The comment rid
 	UA      string `json:"ua" validate:"optional"`      // The comment ua
@@ -72,12 +73,16 @@ func CommentCreate(app *core.App, router fiber.Router) {
 
 		// Prepare the arguments for creating comment
 		var (
-			ip         = c.IP()
-			ua         = cmp.Or(p.UA, string(c.Request().Header.UserAgent())) // allows the patched UA from the post data
-			referer    = cmp.Or(c.Get("Referer"), c.Get("Origin"))
-			isAdmin    = common.CheckIsAdminReq(app, c)
-			isVerified = true // for display the verified badge
+			ip              = c.IP()
+			ua              = cmp.Or(p.UA, string(c.Request().Header.UserAgent())) // allows the patched UA from the post data
+			referer         = cmp.Or(c.Get("Referer"), c.Get("Origin"))
+			userID, isAdmin = common.CheckIsAdminReq(app, c)
+			isVerified      = true // for display the verified badge
 		)
+
+		if p.Avatar != "" {
+			app.Dao().UpdateUserAvatar(userID, p.Avatar)
+		}
 
 		// Find or create page
 		page := app.Dao().FindCreatePage(p.PageKey, p.PageTitle, p.SiteName)
@@ -183,7 +188,8 @@ func isAllowComment(app *core.App, c *fiber.Ctx, name string, email string, page
 	isAdminUser := app.Dao().IsAdminUserByNameEmail(name, email)
 	if isAdminUser || pageAdminOnly {
 		// then check has admin access
-		if !common.CheckIsAdminReq(app, c) {
+		_, isAdmin := common.CheckIsAdminReq(app, c)
+		if !isAdmin {
 			return false, common.RespError(c, 403, i18n.T("Admin access required"), Map{"need_login": true})
 		}
 	}

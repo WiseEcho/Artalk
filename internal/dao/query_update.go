@@ -43,6 +43,10 @@ func (dao *Dao) UpdateUser(user *entity.User) error {
 	return err
 }
 
+func (dao *Dao) UpdateUserAvatar(id uint, avatar string) error {
+	return dao.DB().Model(entity.User{}).Where("id = ?", id).Update("link", avatar).Error
+}
+
 func (dao *Dao) UpdatePage(page *entity.Page) error {
 	err := dao.DB().Save(page).Error
 	if err != nil {
