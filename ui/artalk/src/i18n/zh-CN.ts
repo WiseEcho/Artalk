@@ -37,7 +37,7 @@ const zhCN: I18n = {
   reply: '回复',
   voteUp: '赞同',
   voteDown: '反对',
-  voteFail: '投票失败',
+  voteFail: '失败',
   readMore: '阅读更多',
   actionConfirm: '确认操作',
   collapse: '折叠',
