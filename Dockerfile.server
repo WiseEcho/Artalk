@@ -2,7 +2,6 @@ FROM d-x.cmstop.net/base:3.13
 
 WORKDIR /app
 
-COPY ./artalk /app/artalk
-COPY ./data/artalk.yml /app/data/artalk.yml
+COPY ./build/artalk /app/artalk
 # Run the app by default when the container starts
 ENTRYPOINT ["/app/artalk"]

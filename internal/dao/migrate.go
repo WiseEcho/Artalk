@@ -8,6 +8,7 @@ import (
 )
 
 func (dao *Dao) MigrateModels() {
+	log.Infof("MigrateModels")
 	// Upgrade the database
 	if dao.DB().Migrator().HasTable(&entity.Comment{}) &&
 		(!dao.DB().Migrator().HasColumn(&entity.Comment{}, "root_id") ||

@@ -29,7 +29,10 @@ build:
     	$(PKG_NAME)
 
 linux:
-	env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 CC="x86_64-linux-musl-gcc" CXX="x86_64-linux-musl-g++" go build -tags=jsoniter -v -o ./artalk
+	env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o ./build/artalk
+
+mac:
+	env CGO_ENABLED=0 go build -v -o ./build/artalk
 
 ship: linux
 	docker build --platform=linux/amd64 -f Dockerfile.server -t ${IAMGE_REPO}/${PROJECT_NAME}:${IMAGE_TAG} .
